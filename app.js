@@ -18,16 +18,40 @@ const ItemController = (function() {
     ],
     currentItem: null,
     totalCalories: 0
+  }
 
+  // Public methods
+  return {
+    logData: function() {
+      return data;
+    }
   }
 })();
+
+
 
 // UI Controler
 const UIController = (function() {
 
+  // Public methods
+  return {
+
+  }
 })();
+
+
 
 // App Controler
 const AppController = (function(ItemController, UIController) {
 
+  // Public methods
+  return {
+    init: function() {
+      console.log('Initializing App...');
+    }
+  }
+
 })(ItemController, UIController);
+
+// Initialize App
+AppController.init();
