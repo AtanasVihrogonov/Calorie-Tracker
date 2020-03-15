@@ -25,19 +25,25 @@ const ItemController = (function() {
     getItems: function() {
       return data.items;
     },
+    addItem: function(name, calories) {
+      // Create ID
+      
+    },
     logData: function() {
       return data;
     }
   }
 })();
 
-
+/////////////////////////////////////////////////////////////////////////////////
 
 // UI Controler
 const UIController = (function() {
-  const UISelector = {
+  const UISelectors = {
     itemList: '#item-list',
-    addBtn: '.add-btn'
+    addBtn: '.add-btn',
+    itemNameInput: '#item-name',
+    itemCaloriesInput: '#item-calories'
   }
 
   // Public methods
@@ -55,12 +61,21 @@ const UIController = (function() {
       });
 
       // Insert list items
-      document.querySelector(UISelector.itemList).innerHTML = html;
+      document.querySelector(UISelectors.itemList).innerHTML = html;
+    },
+    getItemInput: function() {
+      return {
+        name: document.querySelector(UISelectors.itemNameInput).value,
+        calories: document.querySelector(UISelectors.itemCaloriesInput).value
+      }
+    },
+    getSelectors: function() {
+      return UISelectors;
     }
   }
 })();
 
-
+////////////////////////////////////////////////////////////////////////////////////////////
 
 // App Controler
 const AppController = (function(ItemController, UIController) {
@@ -74,7 +89,20 @@ const AppController = (function(ItemController, UIController) {
   }
 
   // Add item submit
-  
+  const itemAddSubmit = function(e) {
+    e.preventDefault();
+
+    // Get from input from UI Controler
+    const input = UIController.getItemInput();
+
+    // Check for name and calories input
+    if(input.name !== '' && input.calories !== '') {
+      // Add item
+      const newItem = ItemController.addItem(input.name, input.calories);
+    }
+
+    
+  }
 
   // Public methods
   return {
@@ -84,10 +112,10 @@ const AppController = (function(ItemController, UIController) {
 
       // Populate list with items
       UIController.populateItemList(items);
+
+      // Load event listeners
+      loadEventListeners();
     },
-    getSelectors: function() {
-      return UISelectors;
-    }
   }
 
 })(ItemController, UIController);
