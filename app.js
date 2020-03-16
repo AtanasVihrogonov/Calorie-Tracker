@@ -58,6 +58,9 @@ const ItemController = (function() {
     setCurrentItem: function(item) {
       data.currentItem = item;
     },
+    getCurrentItem: function() {
+      return data.currentItem;
+    },
     getTotalCalories: function() {
       let total = 0;
 
@@ -135,6 +138,11 @@ const UIController = (function() {
       document.querySelector(UISelectors.itemNameInput).value = '';
       document.querySelector(UISelectors.itemCaloriesInput).value = '';
     },
+    addItemToForm: function() {
+      document.querySelector(UISelectors.itemNameInput).value = ItemController.getCurrentItem().name;
+      document.querySelector(UISelectors.itemCaloriesInput).value = ItemController.getCurrentItem().calories;
+      UIController.showEditState();
+    },
     hideList: function() {
       document.querySelector(UISelectors.itemList).style.display = 'none';
     },
@@ -147,6 +155,12 @@ const UIController = (function() {
       document.querySelector(UISelectors.deleteBtn).style.display = 'none';
       document.querySelector(UISelectors.backBtn).style.display = 'none';
       document.querySelector(UISelectors.addBtn).style.display = 'inline';
+    },
+    showEditState: function() {
+      document.querySelector(UISelectors.updateBtn).style.display = 'inline';
+      document.querySelector(UISelectors.deleteBtn).style.display = 'inline';
+      document.querySelector(UISelectors.backBtn).style.display = 'inline';
+      document.querySelector(UISelectors.addBtn).style.display = 'none';
     },
     getSelectors: function() {
       return UISelectors;
@@ -165,7 +179,8 @@ const AppController = (function(ItemController, UIController) {
     // Add item event
     document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
     // Edit icon click event
-    document.querySelector(UISelectors.itemList).addEventListener('click', itemUpdateSubmit);
+    document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
+    // Update item event
   }
 
   // Add item submit
@@ -190,8 +205,8 @@ const AppController = (function(ItemController, UIController) {
     }
   }
 
-  // Update item submit
-  const itemUpdateSubmit = function(e) {
+  // Click edit item
+  const itemEditClick = function(e) {
     e.preventDefault();
 
     if(e.target.classList.contains('edit-item')) {
@@ -204,8 +219,9 @@ const AppController = (function(ItemController, UIController) {
       // Get item
       const itemToEdit = ItemController.getItemById(id);
       // Set current item
-      ItemController.setCurrentItem(item);
-      
+      ItemController.setCurrentItem(itemToEdit);
+      // Add item to form
+      UIController.addItemToForm();
     } 
   }
 
