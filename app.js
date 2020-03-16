@@ -1,4 +1,38 @@
 // Storage Controler
+const StorageController = (function(){
+  // Public methods
+  return {
+    storeItem: function(item) {
+      let items;
+      // Check if any items in ls
+      if(localStorage.getItem('items') === null) {
+        items = [];
+        // Push new item
+        items.push(item);
+        // Set ls
+        localStorage.setItem('items', JSON.stringify(items));
+      } else {
+        // Get what is already in ls
+        items = JSON.parse(localStorage.getItem('items'));
+
+        // Push new item
+        items.push(item);
+
+        // Re set LS
+        localStorage.setItem('items', JSON.stringify(items));
+      }
+    },
+    getItemsFromStorage: function(){
+      let items;
+      if(localStorage.getItem('items') === null) {
+        items = [];
+      } else {
+        items = JSON.parse(localStorage.getItem('items'));
+      }
+      return items;
+    } 
+  }
+})();
 
 /* =========================================================== 
 Item Controler 
@@ -13,11 +47,12 @@ const ItemController = (function() {
 
   // Data Structure / State
   const data = {
-    items: [
-      // { id: 0, name: 'Avocado', calories: 400 },
-      // { id: 0, name: 'Eggs', calories: 300 },
-      // { id: 0, name: 'Lettuce', calories: 200 }
-    ],
+    // items: [
+    //   // { id: 0, name: 'Avocado', calories: 400 },
+    //   // { id: 0, name: 'Eggs', calories: 300 },
+    //   // { id: 0, name: 'Lettuce', calories: 200 }
+    // ],
+    items: StorageController.getItemsFromStorage(),
     currentItem: null,
     totalCalories: 0
   }
@@ -234,7 +269,7 @@ const UIController = (function() {
 /* =========================================================== 
 App Controler 
 =========== */
-const AppController = (function(ItemController, UIController) {
+const AppController = (function(ItemController, StorageController, UIController) {
   // Load Event listeners
   const loadEventListeners = function() {
     // Get UI selectors
@@ -277,6 +312,9 @@ const AppController = (function(ItemController, UIController) {
       const totalCalories = ItemController.getTotalCalories();
       // Add total calories to UI
       UIController.showTotalCalories(totalCalories);
+
+      // Store in localStorage
+      StorageController.storeItem(newItem);
       // Clear fields
       UIController.clearInput();
     }
@@ -377,7 +415,7 @@ const AppController = (function(ItemController, UIController) {
       loadEventListeners();
     },
   }
-})(ItemController, UIController);
+})(ItemController, StorageController, UIController);
 
 // Initialize app
 AppController.init();
