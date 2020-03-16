@@ -26,8 +26,24 @@ const ItemController = (function() {
       return data.items;
     },
     addItem: function(name, calories) {
+      let ID;
       // Create ID
-      
+      if(data.items.length > 0) {
+        ID = data.items[data.items.length - 1].id + 1;
+      } else {
+        ID = 0;
+      }
+
+      // Calories to number
+      calories = parseInt(calories);
+
+      // Create new item
+      newItem = new Item(ID, name, calories);
+
+      // Add to items array
+      data.items.push(newItem);
+
+      return newItem;
     },
     logData: function() {
       return data;
@@ -69,6 +85,27 @@ const UIController = (function() {
         calories: document.querySelector(UISelectors.itemCaloriesInput).value
       }
     },
+    addListItem: function(item) {
+      // Create li element
+      const li = document.createElement('li');
+      // Add class
+      li.className = 'collection-item';
+      // Add ID
+      li.id = `item-${item.id}`;
+
+      // Add html
+      li.innerHTML = `<strong>${item.name}: </strong> <em>${item.calories} Calories</em>
+      <a href="#" class="secondary-content">
+        <i class="edit-item fa fa-pencil"></i>
+      </a>`;
+
+      // Insert item
+      document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
+    },
+    clearInput: function() {
+      document.querySelector(UISelectors.itemNameInput).value = '';
+      document.querySelector(UISelectors.itemCaloriesInput).value = '';
+    },
     getSelectors: function() {
       return UISelectors;
     }
@@ -99,6 +136,11 @@ const AppController = (function(ItemController, UIController) {
     if(input.name !== '' && input.calories !== '') {
       // Add item
       const newItem = ItemController.addItem(input.name, input.calories);
+      // Add item ti UI list
+      UIController.addListItem(newItem);
+      // Clear fields
+      UIController.clearInput();
+
     }
 
     
