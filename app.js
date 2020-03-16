@@ -55,6 +55,32 @@ const ItemController = (function() {
       });
       return found;
     },
+    updateItem: function(name, calories) {
+      // Calories to number
+      calories = parseInt(calories);
+      
+      let found = null;
+      data.items.forEach(function(item) {
+        if(item.id === data.currentItem.id) {
+          item.name = name;
+          item.calories = calories;
+          found = item;
+        }
+      });
+
+      return found;
+    },
+    deleteItem: function(id) {
+      // Get ids
+      const ids = data.items.map(function(item) {
+        return item.id;
+      });
+
+      // Get index
+      const index = ids.indexOf(id);
+      // Remove item
+      data.items.splice(index, 1);
+    },
     setCurrentItem: function(item) {
       data.currentItem = item;
     },
@@ -85,6 +111,7 @@ UI Controler
 const UIController = (function() {
   const UISelectors = {
     itemList: '#item-list',
+    listItems: '#item-list li',
     addBtn: '.add-btn',
     updateBtn: '.update-btn',
     deleteBtn: '.delete-btn',
@@ -134,6 +161,28 @@ const UIController = (function() {
       // Insert item
       document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
     },
+    updateListItem: function(item) {
+      let listItems = document.querySelectorAll(UISelectors.listItems);
+
+      // Turtn Node list intu array
+      listItems = Array.from(listItems);
+
+      listItems.forEach(function(listItem) {
+        const itemID = listItem.getAttribute('id');
+
+        if(itemID === `item-${item.id}`) {
+          document.querySelector(`#${itemID}`).innerHTML = `<strong>${item.name}: </strong> <em>${item.calories} Calories</em>
+          <a href="#" class="secondary-content">
+            <i class="edit-item fa fa-pencil"></i>
+          </a>`;
+        }
+      });
+    },
+    deleteListItem: function(id) {
+      const itemID = `#item-${id}`;
+      const item = document.querySelector(itemID);
+      item.remove();
+    },
     clearInput: function() {
       document.querySelector(UISelectors.itemNameInput).value = '';
       document.querySelector(UISelectors.itemCaloriesInput).value = '';
@@ -178,9 +227,21 @@ const AppController = (function(ItemController, UIController) {
     const UISelectors = UIController.getSelectors();
     // Add item event
     document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
+    // Disable submit on enter
+    document.addEventListener('keypress', function(e) {
+      if(e.keyCode === 13 || e.which === 13) {
+        e.preventDefault();
+        return false;
+      }
+    });
     // Edit icon click event
     document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
     // Update item event
+    document.querySelector(UISelectors.updateBtn).addEventListener('click', itemUpdateSubmit);
+    // Delete item event
+    document.querySelector(UISelectors.deleteBtn).addEventListener('click', itemDeleteSubmit);
+    // Back button event
+    document.querySelector(UISelectors.backBtn).addEventListener('click', UIController.clearEditState);
   }
 
   // Add item submit
@@ -223,6 +284,36 @@ const AppController = (function(ItemController, UIController) {
       // Add item to form
       UIController.addItemToForm();
     } 
+  }
+
+  // Update item submit
+  const itemUpdateSubmit = function(e) {
+    e.preventDefault();
+    
+    // Get item input
+    const input = UIController.getItemInput();
+    // Update item
+    const updatedItem = ItemController.updateItem(input.name, input.calories);
+    // Update UI
+    UIController.updateListItem(updatedItem);
+    // Get the total calories
+    const totalCalories = ItemController.getTotalCalories();
+    // Add total calories to UI
+    UIController.showTotalCalories(totalCalories);
+
+    UIController.clearEditState();
+  }
+
+  // Delete button event
+  const itemDeleteSubmit = function(e) {
+    e.preventDefault();
+
+   // Get current item
+   const currentItem = ItemController.getCurrentItem();
+   // Delete from data structure
+   ItemController.deleteItem(currentItem.id);
+   // Delete from UI
+   UIController.deleteListItem(getCurrentItem.id);
   }
 
   // Public methods
